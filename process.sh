@@ -53,5 +53,4 @@ gdaladdo \
     --config GDAL_CACHEMAX 4096 \
     --config GDAL_NUM_THREADS ALL_CPUS \
     -r average \
-    bmng_3857.tif  \
-    2 4 8 16 32
+    bmng_3857.tif

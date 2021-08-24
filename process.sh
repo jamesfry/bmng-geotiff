@@ -1,6 +1,7 @@
 #!/bin/bash
 
-OUTPUT_DIR=${OUTPUT_DIR:-data}
+SOURCE_DIR=${SOURCE_DIR:-./data/source}
+OUTPUT_DIR=${OUTPUT_DIR:-./data/geotiff}
 
 function ord() {
     LC_CTYPE=C printf '%d' "'$1"
@@ -18,13 +19,13 @@ function ullr() {
 }
 
 regex=".*([ABCD][12]).png"
-for file in ${OUTPUT_DIR}/*.png; do
+for file in ${SOURCE_DIR}/*.png; do
     if [[ $file =~ $regex ]]; then
         extent="${BASH_REMATCH[1]}"
         corners=$(ullr $extent)
         output=$(basename ${file} .png).tif
         echo "Converting ${file} into tiled EPSG:4326 GeoTIFF geo-referenced at ${corners}"...
-        if [ -f "data/${output}" ]; then
+        if [ -f "${OUTPUT_DIR}/${output}" ]; then
             echo "...skipped as ${output} already exists."
             continue
         fi

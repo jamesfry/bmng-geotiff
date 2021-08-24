@@ -2,7 +2,7 @@
 
 # Downloads BMNG PNGs from NASA servers for specified month (default is August - minimal snow cover)
 
-OUTPUT_DIR=${OUTPUT_DIR:-data}
+OUTPUT_DIR=${OUTPUT_DIR:-./data/source}
 mkdir -p ${OUTPUT_DIR}/
 
 MONTHS=${MONTHS:-"01 02 03 04 05 06 07 08 09 10 11 12"}

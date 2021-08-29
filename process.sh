@@ -4,6 +4,7 @@ SOURCE_DIR=${SOURCE_DIR:-./data/source}
 OUTPUT_DIR=${OUTPUT_DIR:-./data/geotiff}
 mkdir -p ${OUTPUT_DIR}/
 
+MONTHS=${MONTHS:-"01 02 03 04 05 06 07 08 09 10 11 12"}
 function ord() {
     LC_CTYPE=C printf '%d' "'$1"
 }
@@ -34,25 +35,33 @@ for file in ${SOURCE_DIR}/*.png; do
     fi
 done
 
-gdalbuildvrt -resolution highest bmng_4326.vrt ${OUTPUT_DIR}/*.tif
 
-gdalwarp -s_srs EPSG:4326 -t_srs EPSG:3857 bmng_4326.vrt bmng_3857.vrt
 
-gdal_translate -of GTiff  \
-    -co TILED=YES \
-    -co COMPRESS=JPEG \
-    -co PHOTOMETRIC=YCBCR \
-    -co JPEG_QUALITY=95 \
-    -co NUM_THREADS=ALL_CPUS \
-    --config GDAL_CACHEMAX 4096 \
-    bmng_3857.vrt \
-    bmng_3857.tif
+for MONTH in ${MONTHS}; do
+    BASE_URL="BASE_URL_$MONTH"
+    BASE_FILE=world.topo.bathy.2004${MONTH}.3x21600x21600
 
-gdaladdo \
-    --config COMPRESS_OVERVIEW JPEG \
-    --config PHOTOMETRIC_OVERVIEW YCBCR \
-    --config INTERLEAVE_OVERVIEW PIXEL \
-    --config GDAL_CACHEMAX 4096 \
-    --config GDAL_NUM_THREADS ALL_CPUS \
-    -r average \
-    bmng_3857.tif
+    gdalbuildvrt -resolution highest world.topo.bathy.2004${MONTH}_4326.vrt ${OUTPUT_DIR}/world.topo.bathy.2004${MONTH}.3x21600x21600.*.tif
+
+    gdalwarp -s_srs EPSG:4326 -t_srs EPSG:3857 world.topo.bathy.2004${MONTH}_4326.vrt world.topo.bathy.2004${MONTH}_3857.vrt
+
+    gdal_translate -of GTiff  \
+        -co TILED=YES \
+        -co COMPRESS=JPEG \
+        -co PHOTOMETRIC=YCBCR \
+        -co JPEG_QUALITY=95 \
+        -co NUM_THREADS=ALL_CPUS \
+        --config GDAL_CACHEMAX 4096 \
+        world.topo.bathy.2004${MONTH}_3857.vrt \
+        world.topo.bathy.2004${MONTH}_3857.tif
+
+    gdaladdo \
+        --config COMPRESS_OVERVIEW JPEG \
+        --config PHOTOMETRIC_OVERVIEW YCBCR \
+        --config INTERLEAVE_OVERVIEW PIXEL \
+        --config GDAL_CACHEMAX 4096 \
+        --config GDAL_NUM_THREADS ALL_CPUS \
+        -r average \
+        world.topo.bathy.2004${MONTH}_3857.tif
+
+done

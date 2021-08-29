@@ -2,6 +2,7 @@
 
 SOURCE_DIR=${SOURCE_DIR:-./data/source}
 OUTPUT_DIR=${OUTPUT_DIR:-./data/geotiff}
+mkdir -p ${OUTPUT_DIR}/
 
 function ord() {
     LC_CTYPE=C printf '%d' "'$1"
@@ -29,7 +30,7 @@ for file in ${SOURCE_DIR}/*.png; do
             echo "...skipped as ${output} already exists."
             continue
         fi
-        gdal_translate -of GTiff -co COMPRESS=DEFLATE -co TILED=yes -a_srs EPSG:4326 -a_ullr ${corners} ${file} ${OUTPUT_DIR}/${ouput}
+        gdal_translate -of GTiff -co COMPRESS=DEFLATE -co TILED=yes -a_srs EPSG:4326 -a_ullr ${corners} ${file} ${OUTPUT_DIR}/${output}
     fi
 done
 
